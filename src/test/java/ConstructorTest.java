@@ -5,34 +5,37 @@ import ru.praktikum.MainPage;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Тесты для проверки навигации в конструкторе.
+ */
 public class ConstructorTest extends BaseTest {
-    private MainPage mainPage;
+    private MainPage homePage;
 
     @Override
-    public void setUp() {
-        super.setUp();
-        mainPage = new MainPage(driver);
+    public void initialize() {
+        super.initialize();
+        homePage = new MainPage(browser);
     }
 
     @Test
-    @DisplayName("Переход к разделу 'Булки'")
-    public void testBunsSection() {
-        mainPage.clickSaucesSection();
-        mainPage.clickBunsSection();
-        assertEquals("Булки", mainPage.getSelectedSectionText());
+    @DisplayName("Переход в раздел 'Булки'")
+    public void testBunsTabNavigation() {
+        homePage.selectSaucesTab();
+        homePage.selectBunsTab();
+        assertEquals("Булки", homePage.getActiveTabText());
     }
 
     @Test
-    @DisplayName("Переход к разделу 'Соусы'")
-    public void testSaucesSection() {
-        mainPage.clickSaucesSection();
-        assertEquals("Соусы", mainPage.getSelectedSectionText());
+    @DisplayName("Переход в раздел 'Соусы'")
+    public void testSaucesTabNavigation() {
+        homePage.selectSaucesTab();
+        assertEquals("Соусы", homePage.getActiveTabText());
     }
 
     @Test
-    @DisplayName("Переход к разделу 'Начинки'")
-    public void testFillingsSection() {
-        mainPage.clickFillingsSection();
-        assertEquals("Начинки", mainPage.getSelectedSectionText());
+    @DisplayName("Переход в раздел 'Начинки'")
+    public void testFillingsTabNavigation() {
+        homePage.selectFillingsTab();
+        assertEquals("Начинки", homePage.getActiveTabText());
     }
 }

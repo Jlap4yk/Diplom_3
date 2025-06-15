@@ -1,8 +1,9 @@
+package ru;
+
 import io.qameta.allure.junit4.DisplayName;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import ru.BaseTest;
 import ru.praktikum.*;
 import ru.praktikum.utils.UserGenerator;
 
@@ -10,57 +11,59 @@ import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Тесты для проверки функционала регистрации.
+ */
 public class RegistrationTest extends BaseTest {
-    private MainPage mainPage;
-    private RegistrationPage registrationPage;
-    private LoginPage loginPage;
-    private String accessToken;
+    private MainPage homePage;
+    private RegistrationPage regPage;
+    private LoginPage authPage;
+    private String userToken;
 
     @Before
     @Override
-    public void setUp() {
-        super.setUp();
-        mainPage = new MainPage(driver);
-        registrationPage = new RegistrationPage(driver);
-        loginPage = new LoginPage(driver);
+    public void initialize() {
+        super.initialize();
+        homePage = new MainPage(browser);
+        regPage = new RegistrationPage(browser);
+        authPage = new LoginPage(browser);
 
-        mainPage.clickLoginButton();
-        loginPage.clickRegisterLink();
+        homePage.pressLoginButton();
+        authPage.pressRegisterLink();
     }
 
     @After
     @Override
-    public void tearDown() {
-        // Удаление пользователя через API, если он был создан
-        if (accessToken != null) {
+    public void cleanup() {
+        // Удаление пользователя через API
+        if (userToken != null) {
             given()
-                    .header("Authorization", accessToken)
-                    .delete(Constants.API_USER_URL);
+                    .header("Authorization", userToken)
+                    .delete(Constants.API_USER_ENDPOINT);
         }
-        super.tearDown();
+        super.cleanup();
     }
 
     @Test
-    @DisplayName("Успешная регистрация")
-    public void testSuccessfulRegistration() {
-        String name = UserGenerator.generateName();
-        String email = UserGenerator.generateEmail();
-        String password = UserGenerator.generatePassword(8);
+    @DisplayName("Успешная регистрация пользователя")
+    public void testSuccessfulUserRegistration() {
+        String userName = UserGenerator.createUsername();
+        String userEmail = UserGenerator.createEmail();
+        String userPassword = UserGenerator.createPassword(8);
 
-        registrationPage.register(name, email, password);
-        assertTrue("Не отображается форма входа",
-                loginPage.isLoginButtonDisplayed());
+        regPage.performRegistration(userName, userEmail, userPassword);
+        assertTrue("Форма входа не отображается", authPage.isSubmitButtonVisible());
     }
 
     @Test
-    @DisplayName("Ошибка при некорректном пароле (менее 6 символов)")
-    public void testShortPasswordError() {
-        String name = UserGenerator.generateName();
-        String email = UserGenerator.generateEmail();
-        String password = UserGenerator.generatePassword(5);
+    @DisplayName("Ошибка при использовании пароля короче 6 символов")
+    public void testInvalidPasswordLength() {
+        String userName = UserGenerator.createUsername();
+        String userEmail = UserGenerator.createEmail();
+        String userPassword = UserGenerator.createPassword(5);
 
-        registrationPage.register(name, email, password);
-        assertEquals("Некорректное сообщение об ошибке",
-                "Некорректный пароль", registrationPage.getPasswordError());
+        regPage.performRegistration(userName, userEmail, userPassword);
+        assertEquals("Неверное сообщение об ошибке пароля",
+                "Некорректный пароль", regPage.retrievePasswordError());
     }
 }

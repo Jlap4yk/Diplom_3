@@ -1,60 +1,63 @@
 package ru.praktikum;
 
 import io.qameta.allure.Step;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
+/**
+ * Класс для работы с главной страницей приложения.
+ */
 public class MainPage {
-    private WebDriver driver;
+    private final WebDriver browser;
 
-    private By loginButton = By.xpath("//button[text()='Войти в аккаунт']");
-    private By personalAccountButton = By.xpath("//p[text()='Личный Кабинет']");
-    private By bunsSection = By.xpath("//span[text()='Булки']/..");
-    private By saucesSection = By.xpath("//span[text()='Соусы']/..");
-    private By fillingsSection = By.xpath("//span[text()='Начинки']/..");
-    private By selectedSection = By.xpath("//div[contains(@class, 'tab_tab_type_current')]");
-    private By orderButton = By.xpath("//button[text()='Оформить заказ']");
+    private final By authButton = By.xpath("//button[text()='Войти в аккаунт']");
+    private final By accountButton = By.xpath("//p[text()='Личный Кабинет']");
+    private final By bunsTab = By.xpath("//span[text()='Булки']/..");
+    private final By saucesTab = By.xpath("//span[text()='Соусы']/..");
+    private final By fillingsTab = By.xpath("//span[text()='Начинки']/..");
+    private final By activeTab = By.xpath("//div[contains(@class, 'tab_tab_type_current')]");
+    private final By placeOrderButton = By.xpath("//button[text()='Оформить заказ']");
 
-    public MainPage(WebDriver driver) {
-        this.driver = driver;
+    public MainPage(WebDriver browser) {
+        this.browser = browser;
     }
 
-    @Step("Клик по кнопке 'Войти в аккаунт'")
-    public void clickLoginButton() {
-        driver.findElement(loginButton).click();
+    @Step("Нажатие на кнопку 'Войти в аккаунт'")
+    public void pressLoginButton() {
+        browser.findElement(authButton).click();
     }
 
-    @Step("Клик по кнопке 'Личный кабинет'")
-    public void clickPersonalAccountButton() {
-        driver.findElement(personalAccountButton).click();
+    @Step("Нажатие на кнопку 'Личный кабинет'")
+    public void pressAccountButton() {
+        browser.findElement(accountButton).click();
     }
 
-    @Step("Клик по разделу 'Булки'")
-    public void clickBunsSection() {
-        driver.findElement(bunsSection).click();
+    @Step("Переход в раздел 'Булки'")
+    public void selectBunsTab() {
+        browser.findElement(bunsTab).click();
     }
 
-    @Step("Клик по разделу 'Соусы'")
-    public void clickSaucesSection() {
-        driver.findElement(saucesSection).click();
+    @Step("Переход в раздел 'Соусы'")
+    public void selectSaucesTab() {
+        browser.findElement(saucesTab).click();
     }
 
-    @Step("Клик по разделу 'Начинки'")
-    public void clickFillingsSection() {
-        driver.findElement(fillingsSection).click();
+    @Step("Переход в раздел 'Начинки'")
+    public void selectFillingsTab() {
+        browser.findElement(fillingsTab).click();
     }
 
-    @Step("Получение текста активного раздела")
-    public String getSelectedSectionText() {
-        return driver.findElement(selectedSection).getText();
+    @Step("Получение текста текущего активного раздела")
+    public String getActiveTabText() {
+        return browser.findElement(activeTab).getText();
     }
 
-    @Step("Проверка отображения кнопки 'Оформить заказ'")
-    public boolean isOrderButtonDisplayed(WebDriverWait wait) {
+    @Step("Проверка видимости кнопки 'Оформить заказ'")
+    public boolean isPlaceOrderButtonVisible(WebDriverWait wait) {
         try {
-            wait.until(ExpectedConditions.visibilityOfElementLocated(orderButton));
+            wait.until(ExpectedConditions.visibilityOfElementLocated(placeOrderButton));
             return true;
         } catch (Exception e) {
             return false;

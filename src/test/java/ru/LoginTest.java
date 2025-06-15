@@ -1,43 +1,45 @@
+package ru;
+
 import io.qameta.allure.junit4.DisplayName;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.devtools.v133.network.model.Response;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import ru.BaseTest;
 import ru.praktikum.*;
 import ru.praktikum.utils.UserGenerator;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Тесты для проверки функционала авторизации.
+ */
 public class LoginTest extends BaseTest {
-    private MainPage mainPage;
-    private LoginPage loginPage;
-    private PasswordRecoveryPage passwordRecoveryPage;
-    private String email;
-    private String password;
-    private String accessToken;
+    private MainPage homePage;
+    private LoginPage authPage;
+    private PasswordRecoveryPage recoveryPage;
+    private String userEmail;
+    private String userPassword;
+    private String userToken;
 
     @Before
     @Override
-    public void setUp() {
-        super.setUp();
-        mainPage = new MainPage(driver);
-        loginPage = new LoginPage(driver);
-        passwordRecoveryPage = new PasswordRecoveryPage(driver);
+    public void initialize() {
+        super.initialize();
+        homePage = new MainPage(browser);
+        authPage = new LoginPage(browser);
+        recoveryPage = new PasswordRecoveryPage(browser);
 
-        // Генерация данных пользователя
-        String name = UserGenerator.generateName();
-        email = UserGenerator.generateEmail();
-        password = UserGenerator.generatePassword(8);
+        // Создание тестового пользователя через API
+        String userName = UserGenerator.createUsername();
+        userEmail = UserGenerator.createEmail();
+        userPassword = UserGenerator.createPassword(8);
 
-        // Регистрация пользователя через API
-        accessToken = given()
+        userToken = given()
                 .header("Content-type", "application/json")
                 .body(String.format("{\"email\": \"%s\", \"password\": \"%s\", \"name\": \"%s\"}",
-                        email, password, name))
-                .post(Constants.API_REGISTER_URL)
+                        userEmail, userPassword, userName))
+                .post(Constants.API_AUTH_REGISTER)
                 .then()
                 .extract()
                 .path("accessToken");
@@ -45,46 +47,42 @@ public class LoginTest extends BaseTest {
 
     @After
     @Override
-    public void tearDown() {
+    public void cleanup() {
         // Удаление пользователя через API
-        if (accessToken != null) {
+        if (userToken != null) {
             given()
-                    .header("Authorization", accessToken)
-                    .delete(Constants.API_USER_URL);
+                    .header("Authorization", userToken)
+                    .delete(Constants.API_USER_ENDPOINT);
         }
-        super.tearDown();
-    }
-
-
-    @Test
-    @DisplayName("Вход через кнопку 'Войти в аккаунт' на главной")
-    public void testLoginViaMainPageButton() {
-        mainPage.clickLoginButton();
-        loginPage.login(email, password);
-        wait.until(ExpectedConditions.urlToBe(Constants.BASE_URL));
-        assertTrue("Кнопка 'Оформить заказ' не отображается",
-                mainPage.isOrderButtonDisplayed(wait));
+        super.cleanup();
     }
 
     @Test
-    @DisplayName("Вход через кнопку 'Личный кабинет'")
-    public void testLoginViaPersonalAccountButton() {
-        mainPage.clickPersonalAccountButton();
-        loginPage.login(email, password);
-        wait.until(ExpectedConditions.urlToBe(Constants.BASE_URL));
-        assertTrue("Кнопка 'Оформить заказ' не отображается",
-                mainPage.isOrderButtonDisplayed(wait));
+    @DisplayName("Авторизация через кнопку 'Войти в аккаунт' на главной странице")
+    public void testLoginFromMainPage() {
+        homePage.pressLoginButton();
+        authPage.performLogin(userEmail, userPassword);
+        wait.until(ExpectedConditions.urlToBe(Constants.SITE_URL));
+        assertTrue("Кнопка 'Оформить заказ' не видна", homePage.isPlaceOrderButtonVisible(wait));
     }
 
     @Test
-    @DisplayName("Вход через кнопку в форме восстановления пароля")
-    public void testLoginViaPasswordRecoveryForm() {
-        mainPage.clickLoginButton();
-        loginPage.clickRecoverPasswordLink();
-        passwordRecoveryPage.clickLoginLink();
-        loginPage.login(email, password);
-        wait.until(ExpectedConditions.urlToBe(Constants.BASE_URL));
-        assertTrue("Кнопка 'Оформить заказ' не отображается",
-                mainPage.isOrderButtonDisplayed(wait));
+    @DisplayName("Авторизация через кнопку 'Личный кабинет'")
+    public void testLoginFromAccountButton() {
+        homePage.pressAccountButton();
+        authPage.performLogin(userEmail, userPassword);
+        wait.until(ExpectedConditions.urlToBe(Constants.SITE_URL));
+        assertTrue("Кнопка 'Оформить заказ' не видна", homePage.isPlaceOrderButtonVisible(wait));
+    }
+
+    @Test
+    @DisplayName("Авторизация через форму восстановления пароля")
+    public void testLoginFromRecoveryForm() {
+        homePage.pressLoginButton();
+        authPage.pressRecoveryLink();
+        recoveryPage.pressLoginLink();
+        authPage.performLogin(userEmail, userPassword);
+        wait.until(ExpectedConditions.urlToBe(Constants.SITE_URL));
+        assertTrue("Кнопка 'Оформить заказ' не видна", homePage.isPlaceOrderButtonVisible(wait));
     }
 }

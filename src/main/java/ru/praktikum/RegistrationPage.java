@@ -1,80 +1,83 @@
 package ru.praktikum;
 
 import io.qameta.allure.Step;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.time.Duration;
 
+/**
+ * Класс для работы со страницей регистрации.
+ */
 public class RegistrationPage {
-    private static final String BASE_URL = "https://stellarburgers.nomoreparties.site/";
-    private static final String REGISTER_PATH = "register";
+    private static final String SITE_URL = "https://stellarburgers.nomoreparties.site/";
+    private static final String REGISTRATION_PATH = "register";
 
-    private final WebDriver driver;
+    private final WebDriver browser;
     private final WebDriverWait wait;
 
-    private final By nameInput = By.xpath("//label[contains(text(), 'Имя')]/following-sibling::input");
-    private final By emailInput = By.xpath("//label[contains(text(), 'Email')]/following-sibling::input");
-    private final By passwordInput = By.xpath("//input[@type='password']");
-    private final By registerButton = By.xpath("//button[contains(text(), 'Зарегистрироваться')]");
+    private final By nameField = By.xpath("//label[contains(text(), 'Имя')]/following-sibling::input");
+    private final By emailField = By.xpath("//label[contains(text(), 'Email')]/following-sibling::input");
+    private final By passwordField = By.xpath("//input[@type='password']");
+    private final By submitButton = By.xpath("//button[contains(text(), 'Зарегистрироваться')]");
     private final By loginLink = By.xpath("//a[contains(text(), 'Войти')]");
-    private final By passwordError = By.xpath("//p[contains(text(), 'Некорректный пароль')]");
+    private final By passwordErrorText = By.xpath("//p[contains(text(), 'Некорректный пароль')]");
 
-    public RegistrationPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    public RegistrationPage(WebDriver browser) {
+        this.browser = browser;
+        this.wait = new WebDriverWait(browser, Duration.ofSeconds(10));
     }
 
     @Step("Открытие страницы регистрации")
-    public void open() {
-        driver.get(BASE_URL + REGISTER_PATH);
+    public void navigateTo() {
+        browser.get(SITE_URL + REGISTRATION_PATH);
     }
 
     @Step("Ввод имени: {name}")
-    public void setName(String name) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(nameInput)).clear();
-        driver.findElement(nameInput).sendKeys(name);
+    public void inputName(String name) {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(nameField)).clear();
+        browser.findElement(nameField).sendKeys(name);
     }
 
     @Step("Ввод email: {email}")
-    public void setEmail(String email) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(emailInput)).clear();
-        driver.findElement(emailInput).sendKeys(email);
+    public void inputEmail(String email) {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(emailField)).clear();
+        browser.findElement(emailField).sendKeys(email);
     }
 
-    @Step("Ввод пароля")
-    public void setPassword(String password) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(passwordInput)).clear();
-        driver.findElement(passwordInput).sendKeys(password);
+    @Step("Ввод пароля: {password}")
+    public void inputPassword(String password) {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(passwordField)).clear();
+        browser.findElement(passwordField).sendKeys(password);
     }
 
-    @Step("Клик по кнопке 'Зарегистрироваться'")
-    public void clickRegisterButton() {
-        wait.until(ExpectedConditions.elementToBeClickable(registerButton)).click();
+    @Step("Нажатие кнопки 'Зарегистрироваться'")
+    public void pressRegisterButton() {
+        wait.until(ExpectedConditions.elementToBeClickable(submitButton)).click();
     }
 
-    @Step("Клик по ссылке 'Войти'")
-    public void clickLoginLink() {
+    @Step("Нажатие ссылки 'Войти'")
+    public void pressLoginLink() {
         wait.until(ExpectedConditions.elementToBeClickable(loginLink)).click();
     }
 
     @Step("Получение текста ошибки пароля")
-    public String getPasswordError() {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(passwordError)).getText();
+    public String retrievePasswordError() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(passwordErrorText)).getText();
     }
 
-    @Step("Регистрация пользователя с именем: {name}, email: {email}")
-    public void register(String name, String email, String password) {
-        setName(name);
-        setEmail(email);
-        setPassword(password);
-        clickRegisterButton();
+    @Step("Регистрация пользователя: имя {name}, email {email}")
+    public void performRegistration(String name, String email, String password) {
+        inputName(name);
+        inputEmail(email);
+        inputPassword(password);
+        pressRegisterButton();
     }
 
-    @Step("Проверка отображения ошибки пароля")
-    public boolean isPasswordErrorDisplayed() {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(passwordError)).isDisplayed();
+    @Step("Проверка видимости ошибки пароля")
+    public boolean isPasswordErrorVisible() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(passwordErrorText)).isDisplayed();
     }
 }

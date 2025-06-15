@@ -2,27 +2,48 @@ package ru.praktikum.utils;
 
 import java.util.Random;
 
+/**
+ * Класс для генерации случайных пользовательских данных.
+ */
 public class UserGenerator {
-    private static final String CHARS = "abcdefghijklmnopqrstuvwxyz";
-    private static final Random random = new Random();
+    private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+    private static final Random rnd = new Random();
 
-    public static String generateName() {
-        return "user_" + randomString(5);
+    /**
+     * Генерирует случайное имя пользователя с префиксом "client_".
+     * @return Сгенерированное имя.
+     */
+    public static String createUsername() {
+        return "client_" + generateRandomText(6);
     }
 
-    public static String generateEmail() {
-        return "test_" + randomString(5) + "@example.com";
+    /**
+     * Генерирует случайный email с префиксом "user_" и доменом "@test.com".
+     * @return Сгенерированный email.
+     */
+    public static String createEmail() {
+        return "user_" + generateRandomText(6) + "@test.com";
     }
 
-    public static String generatePassword(int length) {
-        return randomString(length);
+    /**
+     * Генерирует случайный пароль заданной длины.
+     * @param length Длина пароля.
+     * @return Сгенерированный пароль.
+     */
+    public static String createPassword(int length) {
+        return generateRandomText(length);
     }
 
-    private static String randomString(int length) {
-        StringBuilder sb = new StringBuilder(length);
+    /**
+     * Генерирует случайную строку из букв заданной длины.
+     * @param length Длина строки.
+     * @return Сгенерированная строка.
+     */
+    private static String generateRandomText(int length) {
+        StringBuilder result = new StringBuilder();
         for (int i = 0; i < length; i++) {
-            sb.append(CHARS.charAt(random.nextInt(CHARS.length())));
+            result.append(ALPHABET.charAt(rnd.nextInt(ALPHABET.length())));
         }
-        return sb.toString();
+        return result.toString();
     }
 }

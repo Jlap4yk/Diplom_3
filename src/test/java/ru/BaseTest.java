@@ -10,24 +10,26 @@ import ru.praktikum.utils.WebDriverFactory;
 
 import java.time.Duration;
 
+/**
+ * Базовый класс для тестов, обеспечивающий настройку и завершение работы WebDriver.
+ */
 public class BaseTest {
-    protected WebDriver driver;
+    protected WebDriver browser;
     protected WebDriverWait wait;
 
     @Before
-    @DisplayName("Инициализация драйвера и открытие сайта")
-    public void setUp() {
-        driver = WebDriverFactory.getDriver();
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        driver.get(Constants.BASE_URL);
+    @DisplayName("Подготовка теста: запуск браузера и открытие сайта")
+    public void initialize() {
+        browser = WebDriverFactory.createDriver();
+        wait = new WebDriverWait(browser, Duration.ofSeconds(10));
+        browser.get(Constants.SITE_URL);
     }
 
     @After
-    @DisplayName("Закрытие браузера")
-    public void tearDown() {
-        if (driver != null) {
-            driver.quit();
+    @DisplayName("Завершение теста: закрытие браузера")
+    public void cleanup() {
+        if (browser != null) {
+            browser.quit();
         }
     }
-
 }
