@@ -27,7 +27,7 @@ public class BaseTest {
 
     @After
     @DisplayName("Завершение теста: закрытие браузера")
-    public void cleanup() {
+    public void tearDown() {
         if (browser != null) {
             browser.quit();
         }

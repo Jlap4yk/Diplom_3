@@ -12,8 +12,8 @@ import java.time.Duration;
  * Класс для работы со страницей регистрации.
  */
 public class RegistrationPage {
-    private static final String SITE_URL = "https://stellarburgers.nomoreparties.site/";
-    private static final String REGISTRATION_PATH = "register";
+//    private static final String SITE_URL = "https://stellarburgers.nomoreparties.site/";
+//    private static final String REGISTRATION_PATH = "register";
 
     private final WebDriver browser;
     private final WebDriverWait wait;
@@ -30,10 +30,10 @@ public class RegistrationPage {
         this.wait = new WebDriverWait(browser, Duration.ofSeconds(10));
     }
 
-    @Step("Открытие страницы регистрации")
-    public void navigateTo() {
-        browser.get(SITE_URL + REGISTRATION_PATH);
-    }
+//    @Step("Открытие страницы регистрации")
+//    public void navigateTo() {
+//        browser.get(SITE_URL + REGISTRATION_PATH);
+//    }
 
     @Step("Ввод имени: {name}")
     public void inputName(String name) {
@@ -74,10 +74,5 @@ public class RegistrationPage {
         inputEmail(email);
         inputPassword(password);
         pressRegisterButton();
-    }
-
-    @Step("Проверка видимости ошибки пароля")
-    public boolean isPasswordErrorVisible() {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(passwordErrorText)).isDisplayed();
     }
 }

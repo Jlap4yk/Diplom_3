@@ -5,6 +5,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.io.File;
+
 /**
  * Фабрика для создания экземпляров WebDriver.
  */
@@ -20,8 +22,11 @@ public class WebDriverFactory {
 
         switch (browser.toLowerCase()) {
             case "yandex":
-                String yandexBinary = System.getenv("LOCALAPPDATA") +
-                        "\\Yandex\\YandexBrowser\\Application\\browser.exe";
+                String yandexBinary = "C:\\Program Files (x86)\\Yandex\\YandexBrowser\\Application\\browser.exe";
+                File yandexFile = new File(yandexBinary);
+                if (!yandexFile.exists()) {
+                    throw new RuntimeException("Yandex Browser не найден по пути: " + yandexBinary);
+                }
                 options.setBinary(yandexBinary);
                 WebDriverManager.chromedriver().browserVersion("134").setup();
                 return new ChromeDriver(options);
@@ -37,6 +42,7 @@ public class WebDriverFactory {
      * @return Настроенный WebDriver.
      */
     public static WebDriver createDriver() {
-        return createDriver("chrome");
+        String browser = System.getProperty("browser", "chrome");
+        return createDriver(browser);
     }
 }

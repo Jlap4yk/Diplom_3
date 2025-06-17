@@ -6,8 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 import ru.praktikum.*;
 import ru.praktikum.utils.UserGenerator;
-
-import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -18,7 +16,12 @@ public class RegistrationTest extends BaseTest {
     private MainPage homePage;
     private RegistrationPage regPage;
     private LoginPage authPage;
-    private String userToken;
+    private UserClient userClient;
+    private User user;
+    private String userName;
+    private String userEmail;
+    private String userPassword;
+
 
     @Before
     @Override
@@ -30,26 +33,31 @@ public class RegistrationTest extends BaseTest {
 
         homePage.pressLoginButton();
         authPage.pressRegisterLink();
+
+        user = new User(userEmail, userPassword);
+        userClient = new UserClient();
+
+        userName = UserGenerator.createUsername();
+        userEmail = UserGenerator.createEmail();
+        userPassword = UserGenerator.createPassword(8);
     }
 
     @After
-    @Override
-    public void cleanup() {
-        // Удаление пользователя через API
-        if (userToken != null) {
-            given()
-                    .header("Authorization", userToken)
-                    .delete(Constants.API_USER_ENDPOINT);
+    public void cleanUp () {
+        // Удаление пользователя после теста
+        String accessToken = userClient.checkLoginExistingUser(user)
+                .then()
+                .extract()
+                .path("accessToken");
+
+        if (accessToken != null) {
+            userClient.deleteUser(accessToken);
         }
-        super.cleanup();
     }
 
     @Test
     @DisplayName("Успешная регистрация пользователя")
     public void testSuccessfulUserRegistration() {
-        String userName = UserGenerator.createUsername();
-        String userEmail = UserGenerator.createEmail();
-        String userPassword = UserGenerator.createPassword(8);
 
         regPage.performRegistration(userName, userEmail, userPassword);
         assertTrue("Форма входа не отображается", authPage.isSubmitButtonVisible());

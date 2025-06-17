@@ -52,10 +52,10 @@ public class LoginPage {
         wait.until(ExpectedConditions.elementToBeClickable(recoveryLink)).click();
     }
 
-    @Step("Получение сообщения об ошибке")
-    public String retrieveErrorMessage() {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(errorText)).getText();
-    }
+//    @Step("Получение сообщения об ошибке")
+//    public String retrieveErrorMessage() {
+//        return wait.until(ExpectedConditions.visibilityOfElementLocated(errorText)).getText();
+//    }
 
     @Step("Авторизация пользователя с email: {email}")
     public void performLogin(String email, String password) {
